@@ -14,13 +14,17 @@
 
     <div class="grid grid-cols-2 gap-8 my-8 max-w-5xl mx-auto">
       <div class="flex flex-col">
-        <GameBoard :grid="playerBoardView" board-title="Your Fleet" :show-ships="true" />
+        <GameBoard
+          :grid="playerBoardView as GameBoardGrid"
+          board-title="Your Fleet"
+          :show-ships="true"
+        />
       </div>
 
       <div class="flex flex-col">
         <GameBoard
           board-title="Enemy Fleet"
-          :grid="computerBoardView"
+          :grid="computerBoardView as GameBoardGrid"
           :show-ships="false"
           @cell-click="handlePlayerShoot"
         />
@@ -53,6 +57,8 @@
 import { useGame, GameState } from "./composables/useGame";
 import GameBoard from "./components/GameBoard.vue";
 import GameInput from "./components/GameInput.vue";
+
+import type { GameBoardGrid } from "./types/game";
 
 const {
   playerBoardView,

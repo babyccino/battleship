@@ -26,9 +26,10 @@
           v-for="(cell, colIdx) in row"
           :key="`cell-${rowIdx}-${colIdx}`"
           class="w-10 h-10 border border-gray-400 p-0 flex items-center justify-center cursor-pointer text-xl bg-blue-100 hover:bg-blue-300 hover:scale-110 active:bg-blue-400 transition-all duration-200"
+          :data-state="showShips ? cell.state : cell.state === 'ship' ? 'empty' : cell.state"
           :class="getCellClass(cell)"
+          :disabled="cell.state === 'miss' || cell.state === 'hit' || undefined"
           @click="handleCellClick(rowIdx, colIdx)"
-          :disabled="cell.state !== 'empty' && !showShips"
         >
           {{ getCellSymbol(cell) }}
         </button>
@@ -72,6 +73,7 @@ function getCellSymbol(cell: CellState): string {
 }
 
 function handleCellClick(row: number, col: number) {
+  console.log("Cell click", { row, col });
   emit("cellClick", row, col);
 }
 </script>

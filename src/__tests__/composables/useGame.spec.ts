@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useGame } from "../../composables/useGame";
+import { COMPUTER_WAIT_MS, useGame } from "../../composables/useGame";
 
 describe("useGame", () => {
   let game: ReturnType<typeof useGame>;
@@ -53,7 +53,7 @@ describe("useGame", () => {
 
     it("prevents shooting the same location twice", () => {
       const result1 = game.playerShoot(0, 0);
-      vi.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(COMPUTER_WAIT_MS + 1);
 
       const result2 = game.playerShoot(0, 0);
 
@@ -91,7 +91,7 @@ describe("useGame", () => {
         for (let c = 0; c < 10; c++) {
           if (computerBoard[r][c].state === "ship") {
             game.playerShoot(r, c);
-            vi.advanceTimersByTime(1000);
+            vi.advanceTimersByTime(COMPUTER_WAIT_MS + 1);
           }
         }
       }
@@ -123,7 +123,7 @@ describe("useGame", () => {
   describe("reset", () => {
     it("resets the game state", () => {
       game.playerShoot(0, 0);
-      vi.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(COMPUTER_WAIT_MS + 1);
 
       game.reset();
 
@@ -134,7 +134,7 @@ describe("useGame", () => {
 
     it("clears the boards", () => {
       game.playerShoot(0, 0);
-      vi.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(COMPUTER_WAIT_MS + 1);
       game.reset();
 
       const board = game.computerBoardView.value;

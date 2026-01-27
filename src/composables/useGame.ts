@@ -3,6 +3,7 @@ import { useGameBoard } from "@/composables/useGameBoard";
 import { useAIPlayer } from "@/composables/useAIPlayer";
 
 const STARTING_MESSAGE = "Game started! Shoot your shot!";
+export const COMPUTER_WAIT_MS = 500;
 
 export enum GameState {
   PLAYER_TURN,
@@ -78,9 +79,12 @@ export function useGame() {
   }
 
   function playerShoot(row: number, col: number): boolean {
+    console.log("Player shoot");
     if (gameState.value !== GameState.PLAYER_TURN) throw new Error("Not player's turn");
 
+    console.log({ row, col });
     if (computerBoard.hasBeenShot(row, col)) {
+      console.log("Already shot");
       lastMessage.value = "You already shot at this location!";
       return false;
     }
@@ -98,7 +102,7 @@ export function useGame() {
 
     setTimeout(() => {
       computerShoot();
-    }, 1000);
+    }, COMPUTER_WAIT_MS);
 
     gameState.value = GameState.COMPUTER_TURN;
 
