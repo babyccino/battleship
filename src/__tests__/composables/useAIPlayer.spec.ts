@@ -1,17 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { useAIPlayer } from "../../composables/useAIPlayer";
+import { useComputerBoard } from "../../composables/useAIPlayer";
 
 describe("useAIPlayer", () => {
-  let ai: ReturnType<typeof useAIPlayer>;
-  const shotHistory = new Set<string>();
-
-  const hasBeenShotCallback = (row: number, col: number): boolean => {
-    return shotHistory.has(`${row},${col}`);
-  };
+  let ai: ReturnType<typeof useComputerBoard>;
 
   beforeEach(() => {
-    ai = useAIPlayer(hasBeenShotCallback);
-    shotHistory.clear();
+    ai = useComputerBoard();
+    ai.reset();
   });
 
   describe("initialization", () => {
@@ -40,7 +35,7 @@ describe("useAIPlayer", () => {
         const shot = ai.getNextShot();
         if (shot) {
           shots.push(`${shot.row},${shot.col}`);
-          shotHistory.add(`${shot.row},${shot.col}`);
+          ai.recordShot(shot.row, shot.col);
         }
       }
 
@@ -57,7 +52,6 @@ describe("useAIPlayer", () => {
       expect(firstShot).not.toBeNull();
 
       if (firstShot) {
-        shotHistory.add(`${firstShot.row},${firstShot.col}`);
         ai.recordShotResult(firstShot, true);
 
         const nextShot = ai.getNextShot();
@@ -78,7 +72,6 @@ describe("useAIPlayer", () => {
       expect(firstShot).not.toBeNull();
 
       if (firstShot) {
-        shotHistory.add(`${firstShot.row},${firstShot.col}`);
         ai.recordShotResult(firstShot, false);
 
         const nextShot = ai.getNextShot();

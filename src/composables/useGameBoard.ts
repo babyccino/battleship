@@ -1,4 +1,4 @@
-import { readonly, ref } from "vue";
+import { ref, type ComputedRef } from "vue";
 import { GRID_SIZE } from "@/utils/constants";
 
 import type { Position, Ship, GameBoardGrid } from "@/types/game";
@@ -37,18 +37,15 @@ export function useGameBoard() {
   }
 
   function addShip(shipId: string, size: number, row: number, col: number, isHorizontal: boolean) {
-    const positions: Position[] = [];
-    const ship: Ship = { id: shipId, size, positions, hits: 0 };
+    const ship: Ship = { id: shipId, size, hits: 0 };
 
     if (isHorizontal) {
       for (let c = col; c < col + size; c++) {
         grid.value[row]![c] = { state: "ship", ship };
-        positions.push({ row, col: c });
       }
     } else {
       for (let r = row; r < row + size; r++) {
         grid.value[r]![col] = { state: "ship", ship };
-        positions.push({ row: r, col });
       }
     }
 
@@ -127,11 +124,11 @@ export function useGameBoard() {
   }
 
   return {
-    grid: readonly(grid),
+    grid: grid as ComputedRef<GameBoardGrid>,
     placeShip,
     recordShot,
     hasBeenShot,
-    ships: readonly(ships),
+    ships: ships as ComputedRef<Ship[]>,
     isShipSunk,
     getSunkShipCount,
     allShipsSunk,

@@ -1,6 +1,7 @@
 import { GRID_SIZE } from "@/utils/constants";
 
 import type { Position } from "@/types/game";
+import { useGameBoard } from "@/composables/useGameBoard";
 
 function getAdjacents(position: Position) {
   return [
@@ -11,11 +12,15 @@ function getAdjacents(position: Position) {
   ];
 }
 
-export function useAIPlayer(hasBeenShotCallback: (row: number, col: number) => boolean) {
+export function useComputerBoard() {
+  const gameBoard = useGameBoard();
+
   const availableTargets: Set<string> = new Set();
   let targetQueue: Position[] = [];
 
   function reset() {
+    gameBoard.reset();
+
     availableTargets.clear();
     for (let row = 0; row < GRID_SIZE; row++) {
       for (let col = 0; col < GRID_SIZE; col++) {
@@ -28,7 +33,7 @@ export function useAIPlayer(hasBeenShotCallback: (row: number, col: number) => b
   function getNextShot(): Position | null {
     if (targetQueue.length > 0) {
       const target = targetQueue.shift();
-      if (target && !hasBeenShotCallback(target.row, target.col)) {
+      if (target && !gameBoard.hasBeenShot(target.row, target.col)) {
         return target;
       }
     }
@@ -60,18 +65,23 @@ export function useAIPlayer(hasBeenShotCallback: (row: number, col: number) => b
         adj.row < GRID_SIZE &&
         adj.col >= 0 &&
         adj.col < GRID_SIZE &&
-        !hasBeenShotCallback(adj.row, adj.col)
+        !gameBoard.hasBeenShot(adj.row, adj.col)
       ) {
         targetQueue.unshift(adj);
       }
     }
   }
 
-  reset();
-
   return {
     getNextShot,
     recordShotResult,
     reset,
+
+    placeShip: gameBoard.placeShip,
+    hasBeenShot: gameBoard.hasBeenShot,
+    recordShot: gameBoard.recordShot,
+    ships: gameBoard.ships,
+    grid: gameBoard.grid,
+    allShipsSunk: gameBoard.allShipsSunk,
   };
 }

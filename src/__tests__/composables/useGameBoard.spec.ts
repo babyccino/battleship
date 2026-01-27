@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useGameBoard } from "../../composables/useGameBoard";
+import type { Position } from "../../types/game";
 
 describe("useGameBoard", () => {
   let board: ReturnType<typeof useGameBoard>;
@@ -7,6 +8,19 @@ describe("useGameBoard", () => {
   beforeEach(() => {
     board = useGameBoard();
   });
+
+  function getShipPositions(shipId: string): Position[] {
+    const positions: Position[] = [];
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        const cell = board.grid.value[r][c];
+        if (cell.state === "ship" && cell.ship.id === shipId) {
+          positions.push({ row: r, col: c });
+        }
+      }
+    }
+    return positions;
+  }
 
   describe("initialization", () => {
     it("creates a 10x10 grid", () => {
@@ -73,7 +87,8 @@ describe("useGameBoard", () => {
 
     it("records a hit on a ship", () => {
       const ship = board.ships.value[0];
-      const firstPos = ship.positions[0];
+      const positions = getShipPositions(ship.id);
+      const firstPos = positions[0];
 
       const isHit = board.recordShot(firstPos.row, firstPos.col);
       expect(isHit).toBe(true);
@@ -87,8 +102,9 @@ describe("useGameBoard", () => {
 
     it("detects when a ship is sunk", () => {
       const ship = board.ships.value[0];
+      const positions = getShipPositions(ship.id);
 
-      for (const pos of ship.positions) {
+      for (const pos of positions) {
         board.recordShot(pos.row, pos.col);
       }
 
@@ -97,7 +113,8 @@ describe("useGameBoard", () => {
 
     it("tracks shot history", () => {
       const ship = board.ships.value[0];
-      const pos = ship.positions[0];
+      const positions = getShipPositions(ship.id);
+      const pos = positions[0];
 
       board.recordShot(pos.row, pos.col);
       expect(board.hasBeenShot(pos.row, pos.col)).toBe(true);
@@ -119,8 +136,9 @@ describe("useGameBoard", () => {
     it("reports all ships sunk when defeated", () => {
       board.placeShip("ship1", 2);
       const ship = board.ships.value[0];
+      const positions = getShipPositions(ship.id);
 
-      for (const pos of ship.positions) {
+      for (const pos of positions) {
         board.recordShot(pos.row, pos.col);
       }
 
@@ -132,7 +150,8 @@ describe("useGameBoard", () => {
       board.placeShip("ship2", 3);
 
       const ship1 = board.ships.value[0];
-      for (const pos of ship1.positions) {
+      const positions = getShipPositions(ship1.id);
+      for (const pos of positions) {
         board.recordShot(pos.row, pos.col);
       }
 
@@ -170,8 +189,20 @@ describe("useGameBoard", () => {
 
     it("grid shows hits and misses", () => {
       const ship = board.ships.value[0];
-      board.recordShot(ship.positions[0].row, ship.positions[0].col);
-      board.recordShot(0, 0);
+      const positions = getShipPositions(ship.id);
+      board.recordShot(positions[0].row, positions[0].col);
+
+      // Find an empty cell to shoot at
+      let emptyCell = { row: 0, col: 0 };
+      for (let r = 0; r < 10; r++) {
+        for (let c = 0; c < 10; c++) {
+          if (board.grid.value[r][c].state === "empty") {
+            emptyCell = { row: r, col: c };
+            break;
+          }
+        }
+      }
+      board.recordShot(emptyCell.row, emptyCell.col);
 
       const grid = board.grid.value;
       let hitCount = 0;

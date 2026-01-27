@@ -8,7 +8,6 @@ export interface Position {
 export interface Ship {
   id: string;
   size: number;
-  positions: Position[];
   hits: number;
 }
 

@@ -1,6 +1,7 @@
 import { computed, shallowRef, readonly } from "vue";
 import { useGameBoard } from "@/composables/useGameBoard";
-import { useAIPlayer } from "@/composables/useAIPlayer";
+import { useComputerBoard } from "@/composables/useAIPlayer";
+import type { Ship } from "@/types/game";
 
 const STARTING_MESSAGE = "Game started! Shoot your shot!";
 export const COMPUTER_WAIT_MS = 500;
@@ -14,8 +15,7 @@ export enum GameState {
 
 export function useGame() {
   const playerBoard = useGameBoard();
-  const computerBoard = useGameBoard();
-  const aiPlayer = useAIPlayer((row, col) => computerBoard.hasBeenShot(row, col));
+  const computerBoard = useComputerBoard();
 
   const lastMessage = shallowRef(STARTING_MESSAGE);
   const gameState = shallowRef(GameState.PLAYER_TURN);
@@ -35,17 +35,14 @@ export function useGame() {
   function reset() {
     playerBoard.reset();
     computerBoard.reset();
-    aiPlayer.reset();
     gameState.value = GameState.PLAYER_TURN;
     lastMessage.value = STARTING_MESSAGE;
     setupPlayerShips();
     setupComputerShips();
   }
 
-  function checkForSunkShips(board: ReturnType<typeof useGameBoard>, owner: string) {
+  function checkForSunkShips(ships: Ship[], owner: string) {
     if (lastMessage.value.includes("Sunk")) return;
-
-    const ships = board.ships.value;
 
     for (const ship of ships) {
       if (ship.hits === ship.size && ship.hits > 0) {
@@ -56,11 +53,11 @@ export function useGame() {
   }
 
   function computerShoot() {
-    const shot = aiPlayer.getNextShot();
+    const shot = computerBoard.getNextShot();
     if (!shot) return;
 
     const isHit = playerBoard.recordShot(shot.row, shot.col);
-    aiPlayer.recordShotResult(shot, isHit);
+    computerBoard.recordShotResult(shot, isHit);
 
     if (isHit) {
       lastMessage.value += " Computer hit!";
@@ -68,7 +65,7 @@ export function useGame() {
       lastMessage.value += " Computer missed!";
     }
 
-    checkForSunkShips(playerBoard, "Your");
+    checkForSunkShips(playerBoard.ships.value, "Your");
 
     if (playerBoard.allShipsSunk()) {
       gameState.value = GameState.COMPUTER_WON;
@@ -92,7 +89,7 @@ export function useGame() {
     const isHit = computerBoard.recordShot(row, col);
     lastMessage.value = isHit ? "Hit!" : "Miss!";
 
-    checkForSunkShips(computerBoard, "Computer");
+    checkForSunkShips(computerBoard.ships.value, "Computer");
 
     if (computerBoard.allShipsSunk()) {
       gameState.value = GameState.PLAYER_WON;
