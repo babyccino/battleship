@@ -25,7 +25,7 @@
         <GameBoard
           board-title="Enemy Fleet"
           :grid="computerBoardView as GameBoardGrid"
-          :show-ships="false"
+          :show-ships="true"
           @cell-click="handlePlayerShoot"
         />
       </div>

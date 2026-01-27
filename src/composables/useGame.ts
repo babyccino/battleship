@@ -76,12 +76,9 @@ export function useGame() {
   }
 
   function playerShoot(row: number, col: number): boolean {
-    console.log("Player shoot");
     if (gameState.value !== GameState.PLAYER_TURN) throw new Error("Not player's turn");
 
-    console.log({ row, col });
     if (computerBoard.hasBeenShot(row, col)) {
-      console.log("Already shot");
       lastMessage.value = "You already shot at this location!";
       return false;
     }
@@ -97,11 +94,11 @@ export function useGame() {
       return true;
     }
 
+    gameState.value = GameState.COMPUTER_TURN;
+
     setTimeout(() => {
       computerShoot();
     }, COMPUTER_WAIT_MS);
-
-    gameState.value = GameState.COMPUTER_TURN;
 
     return true;
   }

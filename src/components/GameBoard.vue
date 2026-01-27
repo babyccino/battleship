@@ -73,7 +73,6 @@ function getCellSymbol(cell: CellState): string {
 }
 
 function handleCellClick(row: number, col: number) {
-  console.log("Cell click", { row, col });
   emit("cellClick", row, col);
 }
 </script>

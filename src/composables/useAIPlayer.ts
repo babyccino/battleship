@@ -16,17 +16,21 @@ export function useComputerBoard() {
   const gameBoard = useGameBoard();
 
   const availableTargets: Set<string> = new Set();
+  resetTargets();
   let targetQueue: Position[] = [];
 
-  function reset() {
-    gameBoard.reset();
-
+  function resetTargets() {
     availableTargets.clear();
     for (let row = 0; row < GRID_SIZE; row++) {
       for (let col = 0; col < GRID_SIZE; col++) {
         availableTargets.add(`${row},${col}`);
       }
     }
+  }
+
+  function reset() {
+    gameBoard.reset();
+    resetTargets();
     targetQueue = [];
   }
 
