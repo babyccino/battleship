@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { readonly, ref } from "vue";
 import { GRID_SIZE } from "@/utils/constants";
 
 import type { Position, Ship, GameBoardGrid } from "@/types/game";
@@ -110,6 +110,7 @@ export function useGameBoard() {
         count++;
       }
     }
+
     return count;
   }
 
@@ -126,11 +127,11 @@ export function useGameBoard() {
   }
 
   return {
-    grid,
+    grid: readonly(grid),
     placeShip,
     recordShot,
     hasBeenShot,
-    ships,
+    ships: readonly(ships),
     isShipSunk,
     getSunkShipCount,
     allShipsSunk,
